@@ -1,0 +1,10 @@
+# Essential packages only
+streamlit>=1.28.0
+pandas>=2.0.0
+openai>=1.0.0
+python-dotenv>=1.0.0
+openpyxl>=3.1.0
+
+# Optional: For fuzzy matching (uncomment if you want better similarity matching)
+# fuzzywuzzy>=0.18.0
+# python-Levenshtein>=0.21.0
