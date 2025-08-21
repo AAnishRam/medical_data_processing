@@ -315,17 +315,9 @@ def main():
     st.title("🏥 Enhanced Healthcare Data Cleaning Tool")
     st.markdown("*Faster, more accurate medical data processing with smart caching*")
     
-    # Sidebar for configuration
-    with st.sidebar:
-        st.header("⚙️ Configuration")
-        enable_cache = st.checkbox("Enable Local Cache", value=True, help="Uses local cache to speed up processing")
-        confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.7, help="Minimum confidence for local processing")
-        st.markdown("---")
-        st.markdown("**Features:**")
-        st.markdown("- 🚀 90% local processing")
-        st.markdown("- 💾 Smart caching system")
-        st.markdown("- 🎯 Medical knowledge base")
-        st.markdown("- ⚡ Reduced API calls")
+    # Set confidence threshold to maximum
+    confidence_threshold = 1.0
+    enable_cache = True
     
     # Initialize cleaner
     if 'cleaner' not in st.session_state:
@@ -408,23 +400,7 @@ def main():
                     
                     processing_time = time.time() - start_time
                     
-                    # Calculate statistics
-                    api_calls = sum(1 for r in results if r['method'] == 'api')
-                    local_processing = len(results) - api_calls
-                    avg_confidence = sum(r['confidence'] for r in results) / len(results) if results else 0
-                    
-                    st.success(f"✅ Processing complete in {processing_time:.2f} seconds!")
-                    
-                    # Display metrics
-                    col1, col2, col3, col4 = st.columns(4)
-                    with col1:
-                        st.metric("Rows Processed", len(results))
-                    with col2:
-                        st.metric("Average Confidence", f"{avg_confidence:.1%}")
-                    with col3:
-                        st.metric("Local Processing", f"{local_processing}/{len(results)}")
-                    with col4:
-                        st.metric("API Calls Saved", len(results) - api_calls)
+                    st.success(f"✅ Processing complete!")
                     
                     # Show comparison
                     st.write("### 🔄 Results Comparison")
@@ -434,9 +410,7 @@ def main():
                             comparison_data.append({
                                 'Row': i + 1,
                                 'Original': result['original'][:50] + "..." if len(str(result['original'])) > 50 else result['original'],
-                                'Cleaned': result['cleaned'][:50] + "..." if len(str(result['cleaned'])) > 50 else result['cleaned'],
-                                'Confidence': f"{result['confidence']:.1%}",
-                                'Method': result['method'].title()
+                                'Result': result['cleaned'][:50] + "..." if len(str(result['cleaned'])) > 50 else result['cleaned']
                             })
                         
                         st.dataframe(pd.DataFrame(comparison_data), use_container_width=True)
@@ -452,25 +426,6 @@ def main():
                             file_name=output_file,
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         )
-                    
-                    # Performance summary
-                    efficiency = (local_processing / len(results)) * 100 if results else 0
-                    
-                    st.write("### 📊 Performance Summary")
-                    perf_col1, perf_col2 = st.columns(2)
-                    
-                    with perf_col1:
-                        st.metric("Processing Efficiency", f"{efficiency:.1f}%", 
-                                help="Percentage of items processed locally without API calls")
-                        st.metric("Processing Speed", f"{len(results)/processing_time:.1f} items/sec")
-                    
-                    with perf_col2:
-                        if efficiency > 80:
-                            st.success("🎯 Excellent efficiency! Low API dependency.")
-                        elif efficiency > 60:
-                            st.warning("⚡ Good efficiency. Consider expanding medical knowledge base.")
-                        else:
-                            st.info("🔄 High API usage. Building local cache for future runs.")
             
             except Exception as e:
                 st.error(f"❌ Processing error: {e}")

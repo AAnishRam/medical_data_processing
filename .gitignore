@@ -7,3 +7,11 @@ venv/
 # Ignore cache & other junk
 __pycache__/
 *.pyc
+
+# Ignore processed data files
+enhanced_cleaned_data.xlsx
+cleaned_data*.xlsx
+
+# Ignore medical cache database
+medical_cache.db
+medical_cache.db-journal
