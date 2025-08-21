@@ -352,8 +352,8 @@ def main():
         # Column selection and processing options
         target_column = st.selectbox("🎯 Select column to clean", df.columns)
         
-        # Set default value based on dataset size
-        default_rows = min(50, len(df))
+        # Set default value to process all rows
+        default_rows = len(df)
         row_limit = st.number_input("📊 Number of rows to process", min_value=1, max_value=len(df), value=default_rows, step=min(10, len(df)))
         
         # Quick analysis preview
@@ -406,12 +406,28 @@ def main():
                     st.write("### 🔄 Results Comparison")
                     if results:
                         comparison_data = []
-                        for i, result in enumerate(results[:10]):
+                        # Show all results (with pagination for large datasets)
+                        max_display = 100  # Limit display to prevent UI slowdown
+                        results_to_show = results[:max_display] if len(results) > max_display else results
+                        
+                        for i, result in enumerate(results_to_show):
+                            # Increase character limit and show full text for medical data
+                            original_text = str(result['original'])
+                            cleaned_text = str(result['cleaned'])
+                            
+                            # Show more characters but still truncate very long entries
+                            max_chars = 150  # Increased from 50 to 150
+                            original_display = original_text[:max_chars] + "..." if len(original_text) > max_chars else original_text
+                            cleaned_display = cleaned_text[:max_chars] + "..." if len(cleaned_text) > max_chars else cleaned_text
+                            
                             comparison_data.append({
                                 'Row': i + 1,
-                                'Original': result['original'][:50] + "..." if len(str(result['original'])) > 50 else result['original'],
-                                'Result': result['cleaned'][:50] + "..." if len(str(result['cleaned'])) > 50 else result['cleaned']
+                                'Original': original_display,
+                                'Result': cleaned_display
                             })
+                        
+                        if len(results) > max_display:
+                            st.info(f"📊 Showing first {max_display} of {len(results)} processed rows. Full results available in download.")
                         
                         st.dataframe(pd.DataFrame(comparison_data), use_container_width=True)
                     
